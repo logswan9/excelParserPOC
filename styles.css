@@ -1,5 +1,7 @@
 .upload-container {
     position: relative;
+    display: flex;
+    justify-content: center;
 }
 .upload-container input {
     border: 1px solid #92b0b3;
@@ -19,7 +21,6 @@
     position: absolute;
     bottom: 50px;
     left: 245px;
-    content: " (or) Drag and Drop files here. ";
     color: #3f8188;
     font-weight: 900;
 }
@@ -27,4 +28,11 @@
 .upload-btn {
     margin-left: 300px;
     padding: 7px 20px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+#test {
+    display: inline-block;
 }
