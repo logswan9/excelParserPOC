@@ -1,6 +1,6 @@
 const electron = require('electron');
 const { app, BrowserWindow } = electron;
-const ipc = electron.ipcMain;
+const ipcMain = electron.ipcMain;
 
 let mainWindow;
 
@@ -15,7 +15,7 @@ app.on('ready', function() {
     },
     resizable: false
   });
-  mainWindow.loadFile('index.html')
+  mainWindow.loadFile('src/pages/index.html')
 });
 
 app.on('window-all-closed', () => {
@@ -26,18 +26,27 @@ app.on('window-all-closed', () => {
 
 let inputWindow;
 
-ipc.on('get-input', function () {
+ipcMain.on('get-input', function () {
   inputWindow = new BrowserWindow({
     width: 600,
     height: 400,
     icon: 'src/images/cat.png',
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false
+      contextIsolation: false,
     },
     resizable: false
   });
-  inputWindow.loadFile('test.html')
+  inputWindow.loadFile('src/pages/input.html')
 });
+
+ipcMain.on('input-gathered', function (e, year, month, adjReason) {
+  mainWindow.webContents.send('input-window-close', year, month, adjReason);
+  inputWindow.close();
+  inputWindow = null;
+  
+});
+
+
 
 
