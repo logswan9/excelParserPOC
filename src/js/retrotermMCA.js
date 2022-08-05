@@ -19,6 +19,8 @@ var columnHeaders = [];
 var fallonClaims = [];
 var riClaims = [];
 var orthoClaims = []
+var adjustedOrtho = [];
+var nonAdjusted = [];
 
 async function getFilePath() {
 
@@ -181,6 +183,7 @@ ipcRen.on('input-window-close', function(e, year, month, adjReason) {
 function seperateData() {
     console.log(filteredData.length);
     var count = 0;
+    var dataDelete = [];
     filteredData.forEach((row, index) => {
         if (row['PAGR_NAME'] === 'Fallon Community Health Plan') {
             filteredData.splice(row, 1);
@@ -190,6 +193,7 @@ function seperateData() {
 
         if (row['GRGR_STATE'] === 'RI') {
             riClaims.push(row);
+            count++
             filteredData.splice(row, 1);
             
         }
@@ -197,20 +201,76 @@ function seperateData() {
         if (row['DPDP_ID'].substring(0, 2).includes('D8')) {
             //console.log('row to be added: ' + JSON.stringify(row));
             //console.log('index on push: ' + index);
-            orthoClaims.push(row);
+            if (row['CLCL_ID'].substring(row['CLCL_ID'].length - 2, row['CLCL_ID'].length + 1) !== '00') {
+                //console.log(row['CLCL_ID'] + ' index: ' + index);
+                adjustedOrtho.push(row);
+                dataDelete.push(index);
+                
+            } else {
+                //console.log(row['CLCL_ID'] + ' NONADJUST index: ' + index);
+                orthoClaims.push(row);
+                dataDelete.push(index);
+            }
+            //console.log(row['CLCL_ID'].substring(row['CLCL_ID'].length - 2, row['CLCL_ID'].length + 1));
+            
     
             //console.log('index after push: ' + index);
             //filteredData.splice(row, 1);
-            count++;
+            
             //console.log('index after delete: ' + index);
             
             //console.log('row to be deleted: ' + JSON.stringify(row));
         }
     });
 
-    console.log(count);
-    console.log('ORTHO: ' + orthoClaims.length);
+    filteredData.forEach((row, index) => {
+        
+        if (dataDelete.includes(index)) {
+            filteredData.splice(row, 1);
+            
+        }
+    });
+
+    dataDelete.length = 0;
+
+    filteredData.forEach((row, index) => {
+        
+        if (row['CLCL_ID'].substring(row['CLCL_ID'].length - 2, row['CLCL_ID'].length + 1) === '00') {
+            
+            //console.log(row['CLCL_ID'] + ' index: ' + index);
+            //console.log(row['CLCL_ID']);
+            nonAdjusted.push(row);
+            dataDelete.push(index);
+            
+        } 
+    });
+
+    filteredData.forEach((row, index) => {
+        
+        if (dataDelete.includes(index)) {
+            filteredData.splice(row, 1);
+            
+        }
+    });
+
+    console.log(dataDelete.length);
+    //console.log('ORTHO: ' + orthoClaims.length);
+    //console.log('ADJUST' + adjustedOrtho.length);
+    console.log(nonAdjusted.length);
     console.log(filteredData.length);
+    //removeDupes();
+}
+
+function removeDupes() {
+
+    nonAdjusted.forEach((row, index) => {
+        
+        if (nonAdjusted.includes(index)) {
+            filteredData.splice(row, 1);
+            
+        }
+    });
+
 }
 
 
