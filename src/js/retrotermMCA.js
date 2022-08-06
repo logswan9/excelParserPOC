@@ -253,23 +253,46 @@ function seperateData() {
         }
     });
 
-    console.log(dataDelete.length);
+    //console.log(dataDelete.length);
     //console.log('ORTHO: ' + orthoClaims.length);
     //console.log('ADJUST' + adjustedOrtho.length);
-    console.log(nonAdjusted.length);
-    console.log(filteredData.length);
-    //removeDupes();
+    //console.log(nonAdjusted.length);
+    //console.log(filteredData.length);
+    removeDupes();
 }
 
 function removeDupes() {
 
-    nonAdjusted.forEach((row, index) => {
-        
-        if (nonAdjusted.includes(index)) {
-            filteredData.splice(row, 1);
-            
-        }
-    });
+    riClaims = Array.from(new Set(riClaims.map(a => a.CLCL_ID)))
+    .map(CLCL_ID => {
+    return riClaims.find(a => a.CLCL_ID === CLCL_ID)
+    })
+
+    orthoClaims = Array.from(new Set(orthoClaims.map(a => a.CLCL_ID)))
+    .map(CLCL_ID => {
+    return orthoClaims.find(a => a.CLCL_ID === CLCL_ID)
+    })
+
+    adjustedOrtho = Array.from(new Set(adjustedOrtho.map(a => a.CLCL_ID)))
+    .map(CLCL_ID => {
+    return adjustedOrtho.find(a => a.CLCL_ID === CLCL_ID)
+    })
+
+    nonAdjusted = Array.from(new Set(nonAdjusted.map(a => a.CLCL_ID)))
+    .map(CLCL_ID => {
+    return nonAdjusted.find(a => a.CLCL_ID === CLCL_ID)
+    })
+
+    filteredData = Array.from(new Set(filteredData.map(a => a.CLCL_ID)))
+    .map(CLCL_ID => {
+    return filteredData.find(a => a.CLCL_ID === CLCL_ID)
+    })
+
+    console.log(riClaims);
+    console.log(orthoClaims);
+    console.log(adjustedOrtho);
+    console.log(nonAdjusted);
+    console.log(filteredData);
 
 }
 
