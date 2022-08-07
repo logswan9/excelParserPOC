@@ -14,6 +14,7 @@ var submitBtn = document.getElementById('submitBtn').addEventListener("click", g
 var month = "";
 var year = "";
 var adjReason = "";
+var rawData = [];
 var filteredData = [];
 var columnHeaders = [];
 var fallonClaims = [];
@@ -115,6 +116,7 @@ ipcRen.on('input-window-close', function(e, year, month, adjReason) {
                     
                     //count++;
                     filteredData.push(rowData);
+                    rawData.push(rowData);
                 }
                 //console.log();
             }
@@ -134,49 +136,13 @@ ipcRen.on('input-window-close', function(e, year, month, adjReason) {
         //     console.log(JSON.stringify(row));
         // });
         // console.log(count);
+        
         seperateData();
+        
 
     }).catch(err => {
         console.log(err.message);
     });
-
-    
-
-
-
-
-
-    // const workbook = new ExcelJS.Workbook();
-    // const worksheet = workbook.addWorksheet("My Sheet");
-
-    // worksheet.columns = [
-    // {header: 'Id', key: 'id', width: 10},
-    // {header: 'Name', key: 'name', width: 32}, 
-    // {header: 'D.O.B.', key: 'dob', width: 15,}
-    // ];
-
-    // worksheet.addRow({id: 1, name: 'John Doe', dob: new Date(1970, 1, 1)});
-    // worksheet.addRow({id: 2, name: 'Jane Doe', dob: new Date(1965, 1, 7)});
-
-
-    // const fs = require('fs');
-
-    // //const folderName = '/Users/joe/test';
-
-    // try {
-    // if (!fs.existsSync(desktopDir + 'OUT')) {
-    //     fs.mkdirSync(desktopDir + 'OUT');
-    // }
-    // } catch (err) {
-    // console.error(err);
-    // }
-
-    // // save under export.xlsx
-    // await workbook.xlsx.writeFile(desktopDir + 'OUT\\export.xlsx');
-
-
-
-
     
 }); 
 
@@ -293,6 +259,77 @@ function removeDupes() {
     console.log(adjustedOrtho);
     console.log(nonAdjusted);
     console.log(filteredData);
+
+    createReport();
+
+}
+
+async function createReport() {
+
+    const workbook = new ExcelJS.Workbook();
+    const rawDataWS = workbook.addWorksheet("RawData");
+    const orthoWS = workbook.addWorksheet("Ortho");
+    const nonAdjustWS = workbook.addWorksheet("NonAdjustment");
+    const stateListWS = workbook.addWorksheet("StateList");
+    const rhodeIWS = workbook.addWorksheet("Rhode Island");
+    const mcaWS = workbook.addWorksheet("MCA_Final");
+    var excelColumns = [];
+
+
+
+    columnHeaders.forEach(value => {
+        excelColumns.push({header: value, key: value, width: 15});
+    });
+    rawDataWS.columns = excelColumns;
+    orthoWS.columns = excelColumns;
+    nonAdjustWS.columns = excelColumns;
+    rhodeIWS.columns = excelColumns;
+    mcaWS.columns = excelColumns;
+    
+
+    // worksheet.columns = [
+    // {header: 'Id', key: 'id', width: 10},
+    // {header: 'Name', key: 'name', width: 32}, 
+    // {header: 'D.O.B.', key: 'dob', width: 15,}
+    // ];
+
+    rawData.forEach(row => {
+        rawDataWS.addRow(row);
+    });
+    adjustedOrtho.forEach(row => {
+        orthoWS.addRow(row);
+    });
+    orthoClaims.forEach(row => {
+        orthoWS.addRow(row);
+    });
+    nonAdjusted.forEach(row => {
+        nonAdjustWS.addRow(row);
+    });
+    riClaims.forEach(row => {
+        rhodeIWS.addRow(row);
+    });
+    filteredData.forEach(row => {
+        mcaWS.addRow(row);
+    });
+    // worksheet.addRow({id: 1, name: 'John Doe', dob: new Date(1970, 1, 1)});
+    // worksheet.addRow({id: 2, name: 'Jane Doe', dob: new Date(1965, 1, 7)});
+
+
+    const fs = require('fs');
+
+    //const folderName = '/Users/joe/test';
+
+    try {
+    if (!fs.existsSync(desktopDir + 'OUT')) {
+        fs.mkdirSync(desktopDir + 'OUT');
+    }
+    } catch (err) {
+    console.error(err);
+    }
+
+    // save under export.xlsx
+    await workbook.xlsx.writeFile(desktopDir + 'OUT\\export.xlsx');
+
 
 }
 
