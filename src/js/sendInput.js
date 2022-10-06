@@ -5,9 +5,6 @@ const electron = require('electron');
 const ipcRen = electron.ipcRenderer;
 const fs = require('fs');
 
-
-
-
 var submitBtn = document.getElementById('submitBtn').addEventListener("click", sendInput);
 var year = ""
 

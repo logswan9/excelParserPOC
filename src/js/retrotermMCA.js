@@ -11,8 +11,8 @@ const { stringify } = require('querystring');
 var filePath = "";
 var fileName = "";
 var submitBtn = document.getElementById('submitBtn').addEventListener("click", getFilePath);
-var month = "";
-var year = "";
+var monthFN = "";
+var yearFN = "";
 var adjReason = "";
 var rawData = [];
 var filteredData = [];
@@ -34,6 +34,8 @@ async function getFilePath() {
 
 
 ipcRen.on('input-window-close', function(e, year, month, adjReason) {
+    monthFN = month;
+    yearFN = year;
     // FIRST NETWORK COPY
     // fs.copyFile(filePath, desktopDir + 'OUT\\Retroterm ' + month + " " + year + ".xlsx", (err) => {
     //     if (err) console.log(err);
@@ -51,50 +53,32 @@ ipcRen.on('input-window-close', function(e, year, month, adjReason) {
 
     // START EXCEL LOGIC
 
+    const options = {
+        sharedStrings: 'cache',
+        hyperlinks: 'emit',
+        worksheets: 'emit',
+        entries: 'emit'
+      };
+    const workbookReader = new ExcelJS.stream.xlsx.WorkbookReader(filePath, options);
+    workbookReader.read();
     
-    const wb = new ExcelJS.Workbook();
-    //console.log(fileName1);
-    //const fileName = file;
-
-    wb.xlsx.readFile(filePath).then(() => {
+    var rowCount = 0;
+    var rowNumber = 0;
+    var rowCellData = [];
+    
+    workbookReader.on('worksheet', worksheet => {
         
-        const ws = wb.getWorksheet(1);
-
-        // const c1 = ws.getColumn(1);
-        
-        // c1.eachCell(c => {
-
-        //     console.log(c.value);
-        // });
-
-        // const c2 = ws.getColumn(3);
-        
-        // c2.eachCell(c => {
-
-        //     console.log(c.value);
-        // });
-
-        var rowCount = ws.rowCount;
-        //var output = "";
-
-        var count = 0;
-        
-        ws.getRow(1).eachCell(function(cell) {
-            columnHeaders.push(cell.text);
-        });
-        
-        // var yum = ws.getColumn('A');
-        // yum.eachCell(function(cell, rowNumber) {
-        //     console.log(cell.text);
-        // });
-        ws.eachRow({includeEmpty: true}, function(row, rowNumber) {
-
-            // row.eachCell(function(cell) {
-            //     console.log(cell.);
-            // });
+        worksheet.on('row', row => {
             
+            rowCellData = [];
+            if (rowNumber == 0) {
+                row.eachCell(function(cell) {
+                    columnHeaders.push(cell.text);
+                });
+            }
+
             
-            if (rowNumber > 2) {
+            if (rowNumber > 1) {
                 if (row.getCell(42).text === 'N' && row.getCell(43).text === '') {
                     //var compactArray = Object.values(row.values);
                     // console.log(rowNumber);
@@ -118,31 +102,118 @@ ipcRen.on('input-window-close', function(e, year, month, adjReason) {
                     filteredData.push(rowData);
                     rawData.push(rowData);
                 }
-                //console.log();
+
             }
-            //console.log(JSON.stringify(rowData));
-            
-            
-            // console.log(rowNumber);
-            // var compactArray = Object.values(row.values);
-            // console.log(compactArray);
-
-
-            //console.log("Row: " + rowNumber + "  Values: " + row.values);
-            
+            console.log(rowNumber);
+            rowNumber++;
+            rowCount++;
         });
-        //console.log(filteredData.length);
-        // filteredData.forEach(row => {
-        //     console.log(JSON.stringify(row));
-        // });
-        // console.log(count);
-        
+    });
+    
+    
+    workbookReader.on('end', () => {
+        //console.log(rowCount);
+        console.log(columnHeaders);
         seperateData();
+    });
+    workbookReader.on('error', (err) => {
+    // ...
+    });
+
+    
+    // const wb = new ExcelJS.Workbook();
+    // //console.log(fileName1);
+    // //const fileName = file;
+
+    // wb.xlsx.readFile(filePath).then(() => {
+        
+    //     const ws = wb.getWorksheet(1);
+
+    //     // const c1 = ws.getColumn(1);
+        
+    //     // c1.eachCell(c => {
+
+    //     //     console.log(c.value);
+    //     // });
+
+    //     // const c2 = ws.getColumn(3);
+        
+    //     // c2.eachCell(c => {
+
+    //     //     console.log(c.value);
+    //     // });
+
+    //     var rowCount = ws.rowCount;
+    //     console.log(rowCount);
+    //     //var output = "";
+
+    //     var count = 0;
+        
+    //     ws.getRow(1).eachCell(function(cell) {
+    //         columnHeaders.push(cell.text);
+    //     });
+        
+    //     // var yum = ws.getColumn('A');
+    //     // yum.eachCell(function(cell, rowNumber) {
+    //     //     console.log(cell.text);
+    //     // });
+    //     ws.eachRow({includeEmpty: true}, function(row, rowNumber) {
+
+    //         // row.eachCell(function(cell) {
+    //         //     console.log(cell.);
+    //         // });
+            
+            
+    //         if (rowNumber > 2) {
+    //             if (row.getCell(42).text === 'N' && row.getCell(43).text === '') {
+    //                 //var compactArray = Object.values(row.values);
+    //                 // console.log(rowNumber);
+    //                 // console.log(row.values);
+    //                 var rowData = {};
+                    
+    //                 for (var i = 1; i <= row.values.length; i++) {
+    //                     if ((String(row.values[i])) === 'undefined') {
+    //                         rowData[columnHeaders[i - 1]] = '';
+    //                     } else {
+    //                         rowData[columnHeaders[i - 1]] = (String(row.values[i]));
+    //                     }
+                        
+    //                     // if (String(row.values[i]).substring(0, 2).includes('D8')) {
+    //                     //     console.log(row.values);
+    //                     //     console.log(rowNumber);
+    //                     // }
+    //                 }
+                    
+    //                 //count++;
+    //                 filteredData.push(rowData);
+    //                 rawData.push(rowData);
+    //             }
+    //             //console.log();
+    //         }
+    //         //console.log(JSON.stringify(rowData));
+            
+            
+    //         // console.log(rowNumber);
+    //         // var compactArray = Object.values(row.values);
+    //         // console.log(compactArray);
+
+
+    //         //console.log("Row: " + rowNumber + "  Values: " + row.values);
+            
+    //     });
+    //     //console.log(filteredData.length);
+    //     // filteredData.forEach(row => {
+    //     //     console.log(JSON.stringify(row));
+    //     // });
+    //     // console.log(count);
+        
+    //     seperateData();
         
 
-    }).catch(err => {
-        console.log(err.message);
-    });
+    // }).catch(err => {
+    //     console.log(err);
+    // });
+    
     
 }); 
 
@@ -159,7 +230,7 @@ function seperateData() {
 
         if (row['GRGR_STATE'] === 'RI') {
             riClaims.push(row);
-            count++
+            count++;
             filteredData.splice(row, 1);
             
         }
@@ -224,6 +295,7 @@ function seperateData() {
     //console.log('ADJUST' + adjustedOrtho.length);
     //console.log(nonAdjusted.length);
     //console.log(filteredData.length);
+    console.log(orthoClaims);
     removeDupes();
 }
 
@@ -265,8 +337,23 @@ function removeDupes() {
 }
 
 async function createReport() {
+    const fs = require('fs');
 
-    const workbook = new ExcelJS.Workbook();
+    try {
+        if (!fs.existsSync(desktopDir + 'OUT')) {
+            fs.mkdirSync(desktopDir + 'OUT');
+        }
+        } catch (err) {
+        console.error(err);
+        }
+
+    const options = {
+        filename: desktopDir + 'OUT\\Retroterm ' + monthFN + ' ' + yearFN + '.xlsx',
+        useStyles: true,
+        useSharedStrings: true
+    };
+
+    const workbook = new ExcelJS.stream.xlsx.WorkbookWriter(options);
     const rawDataWS = workbook.addWorksheet("RawData");
     const orthoWS = workbook.addWorksheet("Ortho");
     const nonAdjustWS = workbook.addWorksheet("NonAdjustment");
@@ -274,6 +361,7 @@ async function createReport() {
     const rhodeIWS = workbook.addWorksheet("Rhode Island");
     const mcaWS = workbook.addWorksheet("MCA_Final");
     var excelColumns = [];
+    //var testCount = 0;
 
 
 
@@ -293,43 +381,69 @@ async function createReport() {
     // {header: 'D.O.B.', key: 'dob', width: 15,}
     // ];
 
-    rawData.forEach(row => {
-        rawDataWS.addRow(row);
-    });
-    adjustedOrtho.forEach(row => {
-        orthoWS.addRow(row);
-    });
-    orthoClaims.forEach(row => {
-        orthoWS.addRow(row);
-    });
-    nonAdjusted.forEach(row => {
-        nonAdjustWS.addRow(row);
-    });
-    riClaims.forEach(row => {
-        rhodeIWS.addRow(row);
-    });
-    filteredData.forEach(row => {
-        mcaWS.addRow(row);
-    });
+    console.log("STARTING RAW DATA INSERT!");
+    for (let i = 0; i < rawData.length; i++) {
+        rawDataWS.addRow(rawData[i]).commit();
+    }
+
+    rawDataWS.commit();
+
+    console.log("STARTING ADJ ORTHO");
+    for (let i = 0; i < adjustedOrtho.length; i++) {
+        orthoWS.addRow(adjustedOrtho[i]).commit();
+    }
+    
+    //orthoWS.commit();
+    
+    console.log("STARTING ORTHO");
+    for (let i = 0; i < orthoClaims.length; i++) {
+        orthoWS.addRow(orthoClaims[i]).commit();
+    }
+    
+    orthoWS.commit();
+    
+    console.log("STARTING NonAdjust");
+    for (let i = 0; i < nonAdjusted.length; i++) {
+        nonAdjustWS.addRow(nonAdjusted[i]).commit();
+    }
+    
+    nonAdjustWS.commit();
+    console.log("STARING RI CLAIMS");
+    for (let i = 0; i < riClaims.length; i++) {
+        rhodeIWS.addRow(riClaims[i]).commit();
+        
+    }
+    
+    rhodeIWS.commit();
+    console.log("STARTING MCA");
+    for (let i = 0; i < filteredData.length; i++) {
+        mcaWS.addRow(filteredData[i]).commit();
+        
+    }
+    
+    mcaWS.commit();
+    await workbook.commit();
     // worksheet.addRow({id: 1, name: 'John Doe', dob: new Date(1970, 1, 1)});
     // worksheet.addRow({id: 2, name: 'Jane Doe', dob: new Date(1965, 1, 7)});
 
 
-    const fs = require('fs');
+    //const fs = require('fs');
 
     //const folderName = '/Users/joe/test';
 
-    try {
-    if (!fs.existsSync(desktopDir + 'OUT')) {
-        fs.mkdirSync(desktopDir + 'OUT');
-    }
-    } catch (err) {
-    console.error(err);
-    }
+    // try {
+    // if (!fs.existsSync(desktopDir + 'OUT')) {
+    //     fs.mkdirSync(desktopDir + 'OUT');
+    // }
+    // } catch (err) {
+    // console.error(err);
+    // }
 
+    console.log("STARTING SAVE");
     // save under export.xlsx
-    await workbook.xlsx.writeFile(desktopDir + 'OUT\\export.xlsx');
+    //await workbook.xlsx.writeFile(desktopDir + 'OUT\\Retroterm ' + monthFN + ' ' + yearFN + '.xlsx');
 
+    console.log("COMPLETE!");
 
 }
 

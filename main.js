@@ -6,16 +6,16 @@ let mainWindow;
 
 app.on('ready', function() {
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 1000,
-    icon: 'src/images/cat.png',
+    width: 500,
+    height: 800,
+    icon: 'src/images/sword.png',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
     },
     resizable: false
   });
-  mainWindow.loadFile('src/pages/index.html')
+  mainWindow.loadFile('src/pages/FP/indexFP.html')
 });
 
 app.on('window-all-closed', () => {
@@ -30,7 +30,7 @@ ipcMain.on('get-input', function () {
   inputWindow = new BrowserWindow({
     width: 600,
     height: 400,
-    icon: 'src/images/cat.png',
+    icon: 'src/images/sword.png',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
