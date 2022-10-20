@@ -24,7 +24,7 @@ var orthoClaims = []
 //var adjustedOrtho = [];
 var nonAdjusted = [];
 var mca = [];
-var mcaFINAL = [];
+var mcaFINALString = "";
 var tomorrowsDate;
 var events = false;
 var stateList = {'AK':'12','AL':'12','AR':'18','AZ':'12','CA':'12','CA':'12','CO':'12','CT':'12','DC':'6','DE':'12','FL':'12',
@@ -180,7 +180,7 @@ function seperateData() {
             newRow['RCVRY_NUM'] = stateList[row['GRGR_STATE']];
             nonAdjusted.push(newRow);
             mca.push({"CLCL_ID":row.CLCL_ID});
-            mcaFINAL.push({"CLCL_ID":row.CLCL_ID, "ADJ_R":adjReasonG, "col_3":"39", "col_4":"23", "col_5":"", "col_6":"", "date_add_1":tomorrowsDate, "proj_note":"\"" + projectNoteG + "\"", "col_9": "A"});
+            
             
         } 
     });
@@ -220,10 +220,10 @@ function removeDupes() {
     return mca.find(a => a.CLCL_ID === CLCL_ID)
     })
 
-    mcaFINAL = Array.from(new Set(mcaFINAL.map(a => a.CLCL_ID)))
-    .map(CLCL_ID => {
-    return mcaFINAL.find(a => a.CLCL_ID === CLCL_ID)
-    })
+    // mcaFINAL = Array.from(new Set(mcaFINAL.map(a => a.CLCL_ID)))
+    // .map(CLCL_ID => {
+    // return mcaFINAL.find(a => a.CLCL_ID === CLCL_ID)
+    // })
 
     
 
@@ -231,7 +231,7 @@ function removeDupes() {
     console.log(orthoClaims);
     console.log(nonAdjusted);
     console.log(mca);
-    console.log(mcaFINAL);
+    //console.log(mcaFINAL);
     //console.log(filteredData);
 
     createReport();
@@ -265,14 +265,14 @@ async function createReport() {
     var excelColumnsNonRaw = [];
     //var testCount = 0;
 
-    const options2 = {
-        filename: desktopDir + 'OUT\\MCA_'+ monthFN + '_' + yearFN +'.xlsx',
-        useStyles: true,
-        useSharedStrings: true
-    };
+    // const options2 = {
+    //     filename: desktopDir + 'OUT\\MCA_'+ monthFN + '_' + yearFN +'.xlsx',
+    //     useStyles: true,
+    //     useSharedStrings: true
+    // };
 
-    const workbookMCA = new ExcelJS.stream.xlsx.WorkbookWriter(options2);
-    const mcaFinalWS = workbookMCA.addWorksheet("MCA");
+    // const workbookMCA = new ExcelJS.stream.xlsx.WorkbookWriter(options2);
+    // const mcaFinalWS = workbookMCA.addWorksheet("MCA");
 
 
 
@@ -293,9 +293,9 @@ async function createReport() {
     rhodeIWS.columns = [{header: 'CLCL_ID', key: 'CLCL_ID', width: 15}];
     mcaWS.columns = [{header: 'CLCL_ID', key: 'CLCL_ID', width: 15}];
     //mcaFINAL.push({"CLCL_ID":row.CLCL_ID, "ADJ_R":adjReasonG, "col_3":"39", "col_4":"23", "col_5":"", "col_6":"", "date_add_1":"DATE", "proj_note":projectNoteG, "col_9": "A"});
-    mcaFinalWS.columns = [{header: '', key: 'CLCL_ID', width: 15}, {header: '', key: 'ADJ_R', width: 15}, {header: '', key: 'col_3', width: 15},
-                        {header: '', key: 'col_4', width: 15}, {header: '', key: 'col_5', width: 15}, {header: '', key: 'col_6', width: 15},
-                        {header: '', key: 'date_add_1', width: 15}, {header: '', key: 'proj_note', width: 15}, {header: '', key: 'col_9', width: 15}];
+    // mcaFinalWS.columns = [{header: '', key: 'CLCL_ID', width: 15}, {header: '', key: 'ADJ_R', width: 15}, {header: '', key: 'col_3', width: 15},
+    //                     {header: '', key: 'col_4', width: 15}, {header: '', key: 'col_5', width: 15}, {header: '', key: 'col_6', width: 15},
+    //                     {header: '', key: 'date_add_1', width: 15}, {header: '', key: 'proj_note', width: 15}, {header: '', key: 'col_9', width: 15}];
 
     console.log("STARTING RAW DATA INSERT!");
     for (let i = 0; i < rawData.length; i++) {
@@ -329,6 +329,9 @@ async function createReport() {
     console.log("STARTING MCA");
     for (let i = 0; i < mca.length; i++) {
         mcaWS.addRow(mca[i]).commit();
+        if (i > 0) {
+            mcaFINALString += mca[i].CLCL_ID + "\t" + adjReasonG + "\t" + "39" + "\t" + "23" + "\t" + "" + "\t" + "" + "\t" + tomorrowsDate + "\t\"" + projectNoteG + "\"" + "\t" + "A" + "\n";
+        }
         
     }
     
@@ -338,12 +341,17 @@ async function createReport() {
     console.log("COMPLETE!");
 
     console.log("STARTING MCA TEMPLATE");
-    for (let i = 0; i < mcaFINAL.length; i++) {
-        mcaFinalWS.addRow(mcaFINAL[i]).commit();
-    }
+    fs.writeFile(desktopDir + 'OUT\\MCA_Input_File.txt', mcaFINALString, function (err) {
+        if (err) throw err;
+    });
+    // for (let i = 0; i < mcaFINAL.length; i++) {
+    //     mcaFinalWS.addRow(mcaFINAL[i]).commit();
+    // }
 
-    mcaFinalWS.commit();
-    await workbookMCA.commit();
+    // mcaFinalWS.commit();
+    // await workbookMCA.commit();
+    //console.log(mcaFINALString);
+    console.log("MCA FILE COMPLETE");
 
 
     rawData = [];

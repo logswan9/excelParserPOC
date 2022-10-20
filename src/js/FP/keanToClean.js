@@ -15,7 +15,7 @@ export function loadKean() {
 
     // Options for Workbook Writer. Pass it file name. useStyles and useSharedStrings must be true.
     var workbook;
-    var worksheetToCommit;
+    var levelMatchesWS;
     startKeanClean();
 
     async function startKeanClean() {
@@ -63,13 +63,19 @@ export function loadKean() {
                     console.log(nRemoved);
                     console.log(dupeCheck);
                     console.log(duplicatesRemoved);
-                    workbookReader.end();
-                    //setWritableWorkbook(columnHeaders);
+                    //workbookReader.end();
+                    setWritableWorkbook();
+                    levelMatchesWS = workbook.addWorksheet("Level Matches");
+                    var excelColumns = [];
+                    columnHeaders.forEach(value => {
+                        excelColumns.push({header: value, key: value, width: 15});
+                    });
+                    levelMatchesWS.columns = excelColumns;
                 }
                 console.log(levelMatches);
                 messageToUser("STARTING COMMIT");
                 console.log("STARTING COMMIT");
-                commitSheetToWorkbook(currentWS, levelMatches, columnHeaders); // Function call for writing to new excel file. Pass Worksheet Name
+                commitDataToLevelMatches(currentWS, levelMatches); // Function call for writing to new excel file. Pass Worksheet Name
                 levelMatches = []; // Reset sheetData to save memory
                 rowCount = 0; // Set row count to 0 for new sheet
             }
@@ -195,8 +201,8 @@ export function loadKean() {
             console.log(levelMatches);
             messageToUser("STARTING FINAL WS COMMIT");
             console.log("STARTING FINAL WS COMMIT");
-            commitSheetToWorkbook(currentWS, levelMatches, columnHeaders);
-            worksheetToCommit.commit();
+            commitDataToLevelMatches(currentWS, levelMatches, columnHeaders);
+            levelMatchesWS.commit();
             console.log("END COMMITTING WORKBOOK");
             messageToUser("END COMMITTING WORKBOOK");
             workbook.commit();
@@ -209,7 +215,16 @@ export function loadKean() {
 
     }
 
-    async function commitSheetToWorkbook(workSheetName, workSheetData, columnHeaders) {
+    async function commitDataToLevelMatches(workSheetName, workSheetData) {
+
+        
+
+        // Create the columns from an Array that already has the column values. Do this to style the headers in Excel
+        // var excelColumns = [];
+        // columnHeaders.forEach(value => {
+        //     excelColumns.push({header: value, key: value, width: 15});
+        // });
+        // levelMatchesWS.columns = excelColumns;
         //For Commiting Worksheets to the new Excel File. Pass the name of the sheet    
         // being iterated over.
 
@@ -227,7 +242,7 @@ export function loadKean() {
         console.log("Commiting Rows for: " + workSheetName);
         messageToUser("Commiting Rows for: " + String(workSheetName));
         for (let i = 0; i < workSheetData.length; i++) {
-            worksheetToCommit.addRow(workSheetData[i]).commit();
+            levelMatchesWS.addRow(workSheetData[i]).commit();
         }
 
         // Commit the Worksheet after all rows have been committed
@@ -235,11 +250,11 @@ export function loadKean() {
         //messageToUser("WORKSHEET COMMITTED");
         console.log("WORKSHEET COMMITTED");
         workSheetData = null;
-        columnHeaders = null;
+        //columnHeaders = null;
 
     }
 
-    async function setWritableWorkbook(columnHeaders) {
+    async function setWritableWorkbook() {
 
         // To create OUT folder on desktop for testing
         try {
@@ -256,14 +271,14 @@ export function loadKean() {
             useSharedStrings: true
         };
         workbook = new ExcelJS.stream.xlsx.WorkbookWriter(options); // Create workbook object for writing new Excel file. Pass options
-        worksheetToCommit = workbook.addWorksheet("2022 Q2 Master File");
+        // worksheetToCommit = workbook.addWorksheet("Level Matches");
 
-        // Create the columns from an Array that already has the column values. Do this to style the headers in Excel
-        var excelColumns = [];
-        columnHeaders.forEach(value => {
-            excelColumns.push({header: value, key: value, width: 15});
-        });
-        worksheetToCommit.columns = excelColumns;
+        // // Create the columns from an Array that already has the column values. Do this to style the headers in Excel
+        // var excelColumns = [];
+        // columnHeaders.forEach(value => {
+        //     excelColumns.push({header: value, key: value, width: 15});
+        // });
+        // worksheetToCommit.columns = excelColumns;
     }
 
     async function loadingIcon(loading) {
