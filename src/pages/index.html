@@ -4,25 +4,54 @@
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>EXEcalibur</title>
+    <title>EXcalibur</title>
     <link rel="src/images/cat.png">
     <link rel="stylesheet" href="../styles.css">
   </head>
   <body>
     <div class="wrapper">
       
-      <h1 id="title">EXEcalibur</h1>
+      <h1 id="title">EXcalibur</h1>
       <input type="file" id="file_upload">
       <br>
 
     </div>
     <br>
-    <div class="wrapper">
+    <div class="wrapper" id="formPlaceHolder">
 
       <br>
-      <button class="upload-btn" id="submitBtn">Retroterm</button>
+      <button class="upload-btn" id="retroterm">Retroterm</button>
       <br>
 
+      <div class="wrapper2" id="wrapper2">
+        <div class="formDivs">
+          <label>Month (Ex. November): </label>
+          <input type="text" class="form" id="form1">
+        </div>
+        <br>
+        <div class="formDivs">
+          <label>Year (YYYY): </label>
+          <input type="text" class="form" id="form2">
+        </div>
+        <br>
+        <div class="formDivs">
+          <label>Adjustment Reason (Ex. 997): </label>
+          <input type="text" class="form" id="form3">
+        </div>
+        <br>
+        <div class="formDivs">
+          <label>Project Note: </label>
+          <input type="text" class="form" id="form4">
+        </div>
+        <br>
+        <button id="cancel">Cancel</button>
+        <button id="submit">Submit</button>
+      </div>
+      <div id="loadingDiv">
+        <p id="loadingMessage">Processing: </p>
+        <p id="consoleMessage"></p>
+        <div id="loaderRetro"></div>
+      </div>
     </div>
   </body>
   <Script src="../js/retrotermMCA.js"></Script>

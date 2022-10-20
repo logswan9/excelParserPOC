@@ -10,48 +10,70 @@ const { stringify } = require('querystring');
 
 var filePath = "";
 var fileName = "";
-var submitBtn = document.getElementById('submitBtn').addEventListener("click", getFilePath);
+var retrotermBtn = document.getElementById('retroterm');
 var monthFN = "";
 var yearFN = "";
-var adjReason = "";
+var adjReasonG = "";
+var projectNoteG = "";
 var rawData = [];
 var filteredData = [];
 var columnHeaders = [];
-var fallonClaims = [];
+//var fallonClaims = [];
 var riClaims = [];
 var orthoClaims = []
-var adjustedOrtho = [];
+//var adjustedOrtho = [];
 var nonAdjusted = [];
+var mca = [];
+var mcaFINAL = [];
+var tomorrowsDate;
+var events = false;
+var stateList = {'AK':'12','AL':'12','AR':'18','AZ':'12','CA':'12','CA':'12','CO':'12','CT':'12','DC':'6','DE':'12','FL':'12',
+            'GA':'18','HI':'12','IA':'12','ID':'12','IL':'12','IN':'24','KS':'12','KY':'24','LA':'12','MA':'12','MD':'6',
+            'ME':'12','MI':'12','MN':'12','MO':'12','MS':'12','MT':'24','NC':'12','ND':'12','NE':'12','NH':'18','NJ':'18',
+            'NM':'12','NV':'12','NY':'24','OH':'24','OK':'24','OR':'24','PA':'12','PR':'12','RI':'18','SC':'12','SD':'12',
+            'TN':'18','TX':'6','UT':'12','VA':'12','VI':'12','VT':'12','WA':'24','WI':'12','WV':'12','WY':'12'};
 
-async function getFilePath() {
+retrotermBtn.addEventListener("click", function () {
+    tomorrowsDate = new Date(Date.now());
+    tomorrowsDate.setDate(tomorrowsDate.getDate() + 1)
+    tomorrowsDate = tomorrowsDate.toLocaleDateString();
+    console.log(tomorrowsDate);
 
     filePath = document.getElementById('file_upload').files[0].path;
     fileName = document.getElementById('file_upload').files[0].name;
+
+    document.getElementById("wrapper2").style.display = "block";
     
-    ipcRen.send('get-input');
+    var cancelButton = document.getElementById("cancel");
+    var submitButton = document.getElementById("submit");
+    
+    if (!events) {
+        cancelButton.addEventListener('click', function () {
+            //document.getElementById("wrapper2").style.display = "none";
+            location.reload();
+        });
+    
+        submitButton.addEventListener('click', function () {
+            filterInitialDataset(document.getElementById('form1').value, document.getElementById('form2').value, document.getElementById('form3').value, document.getElementById('form4').value);
+        });
+    }
 
-}
+    events = true;
+    
+    //ipcRen.send('get-input'); for opening seperate input window
+
+});
 
 
-ipcRen.on('input-window-close', function(e, year, month, adjReason) {
+async function filterInitialDataset(month, year, adjReason, note) {
+    
+    loadingIcon(true);
+    document.getElementById("wrapper2").style.display = "none";
     monthFN = month;
     yearFN = year;
-    // FIRST NETWORK COPY
-    // fs.copyFile(filePath, desktopDir + 'OUT\\Retroterm ' + month + " " + year + ".xlsx", (err) => {
-    //     if (err) console.log(err);
-    // });
-
-    // fs.copyFile(filePath, "\\\\NAS05059PN\\Shared_MN020\\Dental\\SB Support\\SKYNET\\Node Testing\\Test.xlsx", (err) => {
-    //     if (err) console.log(err);
-    // });
-
-    // SECOND NETWORK COPY
-    // fs.copyFile(filePath, desktopDir + 'OUT\\' + fileName, (err) => {
-    //     if (err) console.log(err);
-    // });
-
-
-    // START EXCEL LOGIC
+    adjReasonG = adjReason;
+    projectNoteG = note;
+    console.log("month: " + monthFN + " year: " + yearFN + " adjReason: " + adjReasonG + " note: " + projectNoteG);
 
     const options = {
         sharedStrings: 'cache',
@@ -80,9 +102,6 @@ ipcRen.on('input-window-close', function(e, year, month, adjReason) {
             
             if (rowNumber > 1) {
                 if (row.getCell(42).text === 'N' && row.getCell(43).text === '') {
-                    //var compactArray = Object.values(row.values);
-                    // console.log(rowNumber);
-                    // console.log(row.values);
                     var rowData = {};
                     
                     for (var i = 1; i <= row.values.length; i++) {
@@ -92,19 +111,13 @@ ipcRen.on('input-window-close', function(e, year, month, adjReason) {
                             rowData[columnHeaders[i - 1]] = (String(row.values[i]));
                         }
                         
-                        // if (String(row.values[i]).substring(0, 2).includes('D8')) {
-                        //     console.log(row.values);
-                        //     console.log(rowNumber);
-                        // }
                     }
                     
-                    //count++;
                     filteredData.push(rowData);
                     rawData.push(rowData);
                 }
 
             }
-            console.log(rowNumber);
             rowNumber++;
             rowCount++;
         });
@@ -112,190 +125,66 @@ ipcRen.on('input-window-close', function(e, year, month, adjReason) {
     
     
     workbookReader.on('end', () => {
-        //console.log(rowCount);
-        console.log(columnHeaders);
         seperateData();
     });
     workbookReader.on('error', (err) => {
-    // ...
+        console.log(err);
     });
 
     
-    // const wb = new ExcelJS.Workbook();
-    // //console.log(fileName1);
-    // //const fileName = file;
-
-    // wb.xlsx.readFile(filePath).then(() => {
-        
-    //     const ws = wb.getWorksheet(1);
-
-    //     // const c1 = ws.getColumn(1);
-        
-    //     // c1.eachCell(c => {
-
-    //     //     console.log(c.value);
-    //     // });
-
-    //     // const c2 = ws.getColumn(3);
-        
-    //     // c2.eachCell(c => {
-
-    //     //     console.log(c.value);
-    //     // });
-
-    //     var rowCount = ws.rowCount;
-    //     console.log(rowCount);
-    //     //var output = "";
-
-    //     var count = 0;
-        
-    //     ws.getRow(1).eachCell(function(cell) {
-    //         columnHeaders.push(cell.text);
-    //     });
-        
-    //     // var yum = ws.getColumn('A');
-    //     // yum.eachCell(function(cell, rowNumber) {
-    //     //     console.log(cell.text);
-    //     // });
-    //     ws.eachRow({includeEmpty: true}, function(row, rowNumber) {
-
-    //         // row.eachCell(function(cell) {
-    //         //     console.log(cell.);
-    //         // });
-            
-            
-    //         if (rowNumber > 2) {
-    //             if (row.getCell(42).text === 'N' && row.getCell(43).text === '') {
-    //                 //var compactArray = Object.values(row.values);
-    //                 // console.log(rowNumber);
-    //                 // console.log(row.values);
-    //                 var rowData = {};
-                    
-    //                 for (var i = 1; i <= row.values.length; i++) {
-    //                     if ((String(row.values[i])) === 'undefined') {
-    //                         rowData[columnHeaders[i - 1]] = '';
-    //                     } else {
-    //                         rowData[columnHeaders[i - 1]] = (String(row.values[i]));
-    //                     }
-                        
-    //                     // if (String(row.values[i]).substring(0, 2).includes('D8')) {
-    //                     //     console.log(row.values);
-    //                     //     console.log(rowNumber);
-    //                     // }
-    //                 }
-                    
-    //                 //count++;
-    //                 filteredData.push(rowData);
-    //                 rawData.push(rowData);
-    //             }
-    //             //console.log();
-    //         }
-    //         //console.log(JSON.stringify(rowData));
-            
-            
-    //         // console.log(rowNumber);
-    //         // var compactArray = Object.values(row.values);
-    //         // console.log(compactArray);
-
-
-    //         //console.log("Row: " + rowNumber + "  Values: " + row.values);
-            
-    //     });
-    //     //console.log(filteredData.length);
-    //     // filteredData.forEach(row => {
-    //     //     console.log(JSON.stringify(row));
-    //     // });
-    //     // console.log(count);
-        
-    //     seperateData();
-        
-
-    // }).catch(err => {
-    //     console.log(err);
-    // });
     
-    
-}); 
+} 
 
 function seperateData() {
-    console.log(filteredData.length);
+    console.log("Start of Seperate Data: " + filteredData.length);
     var count = 0;
-    var dataDelete = [];
     filteredData.forEach((row, index) => {
-        if (row['PAGR_NAME'] === 'Fallon Community Health Plan') {
-            filteredData.splice(row, 1);
+        // if (row['PAGR_NAME'] === 'Fallon Community Health Plan') {   INITIIALLY FOR REMOVING FALLON CLAIMS
+        //     filteredData.splice(row, 1);
             
-        }
+        // }
+        var newRow = {};
 
-
-        if (row['GRGR_STATE'] === 'RI') {
-            riClaims.push(row);
+        if (row['GRGR_STATE'] === 'RI' && row['PAGR_NAME'] != 'Fallon Community Health Plan') {
+            riClaims.push({"CLCL_ID":row.CLCL_ID});
             count++;
-            filteredData.splice(row, 1);
-            
         }
 
-        if (row['DPDP_ID'].substring(0, 2).includes('D8')) {
-            //console.log('row to be added: ' + JSON.stringify(row));
-            //console.log('index on push: ' + index);
-            if (row['CLCL_ID'].substring(row['CLCL_ID'].length - 2, row['CLCL_ID'].length + 1) !== '00') {
-                //console.log(row['CLCL_ID'] + ' index: ' + index);
-                adjustedOrtho.push(row);
-                dataDelete.push(index);
-                
-            } else {
-                //console.log(row['CLCL_ID'] + ' NONADJUST index: ' + index);
-                orthoClaims.push(row);
-                dataDelete.push(index);
-            }
-            //console.log(row['CLCL_ID'].substring(row['CLCL_ID'].length - 2, row['CLCL_ID'].length + 1));
-            
+        if (row['DPDP_ID'].substring(0, 2).includes('D8') && row['GRGR_STATE'] != 'RI' && !row['PAGR_NAME'] != 'Fallon Community Health Plan') {
     
-            //console.log('index after push: ' + index);
-            //filteredData.splice(row, 1);
-            
-            //console.log('index after delete: ' + index);
-            
-            //console.log('row to be deleted: ' + JSON.stringify(row));
-        }
-    });
+            columnHeaders.forEach(value => {
+                if (value != "ACTIVE_FLAG" && value != "J11_FLAG") {
+                    newRow[value] = row[value];
+                } 
+            });
 
-    filteredData.forEach((row, index) => {
-        
-        if (dataDelete.includes(index)) {
-            filteredData.splice(row, 1);
+            newRow['RCVRY_NUM'] = stateList[row['GRGR_STATE']];
+                
+                //console.log(value);
+            orthoClaims.push(newRow);
             
         }
     });
-
-    dataDelete.length = 0;
+    
 
     filteredData.forEach((row, index) => {
+        var newRow = {};
         
-        if (row['CLCL_ID'].substring(row['CLCL_ID'].length - 2, row['CLCL_ID'].length + 1) === '00') {
-            
-            //console.log(row['CLCL_ID'] + ' index: ' + index);
-            //console.log(row['CLCL_ID']);
-            nonAdjusted.push(row);
-            dataDelete.push(index);
+        if (row['CLCL_ID'].substring(row['CLCL_ID'].length - 2, row['CLCL_ID'].length + 1) === '00' && !row['DPDP_ID'].substring(0, 2).includes('D8') && row['GRGR_STATE'] != 'RI' && row['PAGR_NAME'] != 'Fallon Community Health Plan') {
+            columnHeaders.forEach(value => {
+                if (value != "ACTIVE_FLAG" && value != "J11_FLAG") {
+                    newRow[value] = row[value];
+                } 
+            });
+
+            newRow['RCVRY_NUM'] = stateList[row['GRGR_STATE']];
+            nonAdjusted.push(newRow);
+            mca.push({"CLCL_ID":row.CLCL_ID});
+            mcaFINAL.push({"CLCL_ID":row.CLCL_ID, "ADJ_R":adjReasonG, "col_3":"39", "col_4":"23", "col_5":"", "col_6":"", "date_add_1":tomorrowsDate, "proj_note":"\"" + projectNoteG + "\"", "col_9": "A"});
             
         } 
     });
-
-    filteredData.forEach((row, index) => {
-        
-        if (dataDelete.includes(index)) {
-            filteredData.splice(row, 1);
-            
-        }
-    });
-
-    //console.log(dataDelete.length);
-    //console.log('ORTHO: ' + orthoClaims.length);
-    //console.log('ADJUST' + adjustedOrtho.length);
-    //console.log(nonAdjusted.length);
-    //console.log(filteredData.length);
-    console.log(orthoClaims);
+    
     removeDupes();
 }
 
@@ -311,26 +200,39 @@ function removeDupes() {
     return orthoClaims.find(a => a.CLCL_ID === CLCL_ID)
     })
 
-    adjustedOrtho = Array.from(new Set(adjustedOrtho.map(a => a.CLCL_ID)))
-    .map(CLCL_ID => {
-    return adjustedOrtho.find(a => a.CLCL_ID === CLCL_ID)
-    })
+    // adjustedOrtho = Array.from(new Set(adjustedOrtho.map(a => a.CLCL_ID)))
+    // .map(CLCL_ID => {
+    // return adjustedOrtho.find(a => a.CLCL_ID === CLCL_ID)
+    // })
 
     nonAdjusted = Array.from(new Set(nonAdjusted.map(a => a.CLCL_ID)))
     .map(CLCL_ID => {
     return nonAdjusted.find(a => a.CLCL_ID === CLCL_ID)
     })
 
-    filteredData = Array.from(new Set(filteredData.map(a => a.CLCL_ID)))
+    // filteredData = Array.from(new Set(filteredData.map(a => a.CLCL_ID)))
+    // .map(CLCL_ID => {
+    // return filteredData.find(a => a.CLCL_ID === CLCL_ID)
+    // })
+
+    mca = Array.from(new Set(mca.map(a => a.CLCL_ID)))
     .map(CLCL_ID => {
-    return filteredData.find(a => a.CLCL_ID === CLCL_ID)
+    return mca.find(a => a.CLCL_ID === CLCL_ID)
     })
+
+    mcaFINAL = Array.from(new Set(mcaFINAL.map(a => a.CLCL_ID)))
+    .map(CLCL_ID => {
+    return mcaFINAL.find(a => a.CLCL_ID === CLCL_ID)
+    })
+
+    
 
     console.log(riClaims);
     console.log(orthoClaims);
-    console.log(adjustedOrtho);
     console.log(nonAdjusted);
-    console.log(filteredData);
+    console.log(mca);
+    console.log(mcaFINAL);
+    //console.log(filteredData);
 
     createReport();
 
@@ -357,29 +259,43 @@ async function createReport() {
     const rawDataWS = workbook.addWorksheet("RawData");
     const orthoWS = workbook.addWorksheet("Ortho");
     const nonAdjustWS = workbook.addWorksheet("NonAdjustment");
-    const stateListWS = workbook.addWorksheet("StateList");
     const rhodeIWS = workbook.addWorksheet("Rhode Island");
     const mcaWS = workbook.addWorksheet("MCA_Final");
     var excelColumns = [];
+    var excelColumnsNonRaw = [];
     //var testCount = 0;
+
+    const options2 = {
+        filename: desktopDir + 'OUT\\MCA_'+ monthFN + '_' + yearFN +'.xlsx',
+        useStyles: true,
+        useSharedStrings: true
+    };
+
+    const workbookMCA = new ExcelJS.stream.xlsx.WorkbookWriter(options2);
+    const mcaFinalWS = workbookMCA.addWorksheet("MCA");
 
 
 
     columnHeaders.forEach(value => {
         excelColumns.push({header: value, key: value, width: 15});
     });
-    rawDataWS.columns = excelColumns;
-    orthoWS.columns = excelColumns;
-    nonAdjustWS.columns = excelColumns;
-    rhodeIWS.columns = excelColumns;
-    mcaWS.columns = excelColumns;
-    
 
-    // worksheet.columns = [
-    // {header: 'Id', key: 'id', width: 10},
-    // {header: 'Name', key: 'name', width: 32}, 
-    // {header: 'D.O.B.', key: 'dob', width: 15,}
-    // ];
+    columnHeaders.forEach(value => {
+        if (value != "ACTIVE_FLAG" && value != "J11_FLAG") {
+            excelColumnsNonRaw.push({header: value, key: value, width: 15});
+        }  
+    });
+    excelColumnsNonRaw.push({header: 'RCVRY_NUM', key: 'RCVRY_NUM', width: 15});
+    //console.log(excelColumns);
+    rawDataWS.columns = excelColumns;
+    orthoWS.columns = excelColumnsNonRaw;
+    nonAdjustWS.columns = excelColumnsNonRaw;
+    rhodeIWS.columns = [{header: 'CLCL_ID', key: 'CLCL_ID', width: 15}];
+    mcaWS.columns = [{header: 'CLCL_ID', key: 'CLCL_ID', width: 15}];
+    //mcaFINAL.push({"CLCL_ID":row.CLCL_ID, "ADJ_R":adjReasonG, "col_3":"39", "col_4":"23", "col_5":"", "col_6":"", "date_add_1":"DATE", "proj_note":projectNoteG, "col_9": "A"});
+    mcaFinalWS.columns = [{header: '', key: 'CLCL_ID', width: 15}, {header: '', key: 'ADJ_R', width: 15}, {header: '', key: 'col_3', width: 15},
+                        {header: '', key: 'col_4', width: 15}, {header: '', key: 'col_5', width: 15}, {header: '', key: 'col_6', width: 15},
+                        {header: '', key: 'date_add_1', width: 15}, {header: '', key: 'proj_note', width: 15}, {header: '', key: 'col_9', width: 15}];
 
     console.log("STARTING RAW DATA INSERT!");
     for (let i = 0; i < rawData.length; i++) {
@@ -387,13 +303,6 @@ async function createReport() {
     }
 
     rawDataWS.commit();
-
-    console.log("STARTING ADJ ORTHO");
-    for (let i = 0; i < adjustedOrtho.length; i++) {
-        orthoWS.addRow(adjustedOrtho[i]).commit();
-    }
-    
-    //orthoWS.commit();
     
     console.log("STARTING ORTHO");
     for (let i = 0; i < orthoClaims.length; i++) {
@@ -408,6 +317,7 @@ async function createReport() {
     }
     
     nonAdjustWS.commit();
+
     console.log("STARING RI CLAIMS");
     for (let i = 0; i < riClaims.length; i++) {
         rhodeIWS.addRow(riClaims[i]).commit();
@@ -415,51 +325,52 @@ async function createReport() {
     }
     
     rhodeIWS.commit();
+
     console.log("STARTING MCA");
-    for (let i = 0; i < filteredData.length; i++) {
-        mcaWS.addRow(filteredData[i]).commit();
+    for (let i = 0; i < mca.length; i++) {
+        mcaWS.addRow(mca[i]).commit();
         
     }
     
     mcaWS.commit();
-    await workbook.commit();
-    // worksheet.addRow({id: 1, name: 'John Doe', dob: new Date(1970, 1, 1)});
-    // worksheet.addRow({id: 2, name: 'Jane Doe', dob: new Date(1965, 1, 7)});
-
-
-    //const fs = require('fs');
-
-    //const folderName = '/Users/joe/test';
-
-    // try {
-    // if (!fs.existsSync(desktopDir + 'OUT')) {
-    //     fs.mkdirSync(desktopDir + 'OUT');
-    // }
-    // } catch (err) {
-    // console.error(err);
-    // }
-
     console.log("STARTING SAVE");
-    // save under export.xlsx
-    //await workbook.xlsx.writeFile(desktopDir + 'OUT\\Retroterm ' + monthFN + ' ' + yearFN + '.xlsx');
-
+    await workbook.commit();
     console.log("COMPLETE!");
+
+    console.log("STARTING MCA TEMPLATE");
+    for (let i = 0; i < mcaFINAL.length; i++) {
+        mcaFinalWS.addRow(mcaFINAL[i]).commit();
+    }
+
+    mcaFinalWS.commit();
+    await workbookMCA.commit();
+
+
+    rawData = [];
+    filteredData = [];
+    columnHeaders = [];
+    riClaims = [];
+    orthoClaims = []
+    nonAdjusted = [];
+    mca = [];
+    loadingIcon(false);
 
 }
 
+async function loadingIcon(loading) {
+    if (loading) {
+        document.getElementById("loaderRetro").style.display = "block";
+        document.getElementById("loadingMessage").style.display = "block"
+        document.getElementById("consoleMessage").style.display = "block"
+    } else {
+        document.getElementById("loaderRetro").style.display = "none";
+        document.getElementById("consoleMessage").innerHTML = "";
+        document.getElementById("loadingMessage").innerHTML = "COMPLETE. File Has been saved in the OUT folder on your Desktop.";
+        setTimeout(function () {
+            document.getElementById("loadingMessage").innerHTML = "";
+        }, 10000);
+    }
+}
 
-
-//console.log(fileName);
-    
-// if(files.length==0){
-//     alert("Please first choose or drop any file(s)...");
-//     return;
-// }
-//var filename1 = "";
-// for(var i=0;i<files.length;i++){
-    
-// }
-//filename1 = file;
-//alert("Selected file(s) :\n____________________\n"+filename1);
 
 

@@ -1,14 +1,14 @@
 {
-  "name": "csvparserpoc",
+  "name": "Excalibur",
   "version": "1.0.0",
-  "description": "POC CSV Parser",
+  "description": "A program to automate excel reports by reading in an Excel file and manipulating the data to create a report in .xlsx format.",
   "main": "main.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
-  "author": "Logan",
+  "author": "Logan Swanson, Alex Snyder",
   "license": "ISC",
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.65",
@@ -25,13 +25,14 @@
   "config": {
     "forge": {
       "packagerConfig": {
+        "asar": "true",
         "icon": "src/images/sword"
       },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "Execalibur"
+            "name": "Excalibur"
           }
         },
         {
