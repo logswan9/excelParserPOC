@@ -10,6 +10,8 @@ import {loadLost} from "../FP/lostPolicy.js"
 
 var filePath = "";
 var fileName = "";
+var filePath2 = "";
+var fileName2 = "";
 var submitBtn = document.getElementById('lostPolicy').addEventListener("click", startLostPolicy); // Set listener on Lost Policy Button
 var submitBtn2 = document.getElementById('keanClean').addEventListener("click", startKeanClean);
 

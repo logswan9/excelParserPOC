@@ -6,12 +6,23 @@
     display: block;
 }
 
+#title2 {
+    margin-left: 300px;
+    padding: 7px 20px;
+    margin-left: auto;
+    margin-right: auto;
+    display: none;
+}
+
+#selectionDiv {
+    padding-top: 15px;
+}
+
 #file_upload {
     margin-left: auto;
     margin-right: auto;
     display: block;
 }
-
 
 #file_upload::file-selector-button {
     color: #659DBD;
@@ -23,6 +34,23 @@
     background-color: #39393f;
 }
 
+.file_upload_style {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+.file_upload_style::file-selector-button {
+    color: #659DBD;
+    background-color: #1A1A1D;
+    border-radius: 10px;
+}
+
+.file_upload_style::file-selector-button:hover {
+    background-color: #39393f;
+}
+
+
 .upload-btn {
     margin-left: 300px;
     padding: 7px 20px;
@@ -32,6 +60,37 @@
     color: #659DBD;
     background-color: #1A1A1D;
     border-radius: 10px;
+}
+
+.submitCancelBtnsDiv {
+    padding-bottom: 5px;
+    /* margin-left: auto;
+    margin-right: auto; */
+    width: 25%;
+    margin: auto;
+    color: #659DBD;
+    /* background-color: #1A1A1D; */
+    border-radius: 10px;
+    position: relative;
+}
+
+.submitCancelBtnsStyle {
+    padding: 5px;
+    color: #659DBD;
+    background-color: #1A1A1D;
+    border-radius: 10px;
+}
+
+#cancelFPKean {
+    color: white;
+}
+
+#cancelFPKean:hover {
+    color: red;
+}
+
+.submitCancelBtnsStyle:hover {
+    background-color: #39393f;
 }
 
 .upload-btn:hover {
@@ -53,6 +112,25 @@ body {
 
 #wrapper2 {
     display: none;
+}
+
+.formFP {
+    background-color: #39393f;
+    color: #659DBD;
+}
+
+.formDivsFP {
+    margin-left: 15px;
+    
+}
+
+#wrapper2FP {
+    padding-top: 10px;
+    display: none;
+}
+
+#loadingDiv {
+    position: relative;
 }
 
 #loader {
@@ -95,7 +173,7 @@ body {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 24px;
     position: absolute;
-    top: 215px;
+    top: -25px;
     display: none;
 }
 
@@ -105,8 +183,8 @@ body {
     /* font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 24px; */
     position: absolute;
-    top: 230px;
-    left: 140px;
+    top: -10px;
+    left: 128px;
     display: none;
 }
 

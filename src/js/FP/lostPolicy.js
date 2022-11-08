@@ -16,13 +16,16 @@ export function loadLost() {
     // Options for Workbook Writer. Pass it file name. useStyles and useSharedStrings must be true.
     var workbook;
     var worksheetToCommit;
+    var worksheetToCommit2;
+    var sheetThreshholdCheck = 1;
+    var secondWorkSheet = false;
 
     // function startKeanClean() {
 
     //     loadKean();
     // }
     startLostPolicy();
-    async function startLostPolicy() {
+    function startLostPolicy() {
         var sheetData = []; // Sheet data var. We pass this our hashtables from the parsed excel file to write to the new file.
         var currentWS = ''; // Current Worksheet being iterated over
         var wsCount = 0; // To check if on next worksheet
@@ -50,6 +53,7 @@ export function loadLost() {
         var rowCellData = []; // Pass individual cell values as strings to this array of the current row to build a final hash table off of.
         var finalRowData = {}; // Hash Table to put in our global array of sheetData[]. Each entry contains SSN, Ln, Fn, DOB, Group#, and Group.
         var columnHeaders = ['SSN', 'Last Name', 'First Name', 'DOB', 'Group #', 'Group']; // Column headers for new Excel File
+        
         
         // ExcelJS loop to iterate over each work sheet
         workbookReader.on('worksheet', worksheet => {
@@ -85,7 +89,7 @@ export function loadLost() {
                         if (cell.value === null || cell.value === "") {
                             rowCellData.push('');
                         } else {
-                            rowCellData.push(cell.text);
+                            rowCellData.push(String(cell.text));
                         }
                     });
 
@@ -127,14 +131,14 @@ export function loadLost() {
                     finalRowData['Last Name'] = String(rowCellData[1]);
                     finalRowData['First Name'] = String(rowCellData[2]);
 
-                    if (rowCellData[3] != "") {
+                    if (String(rowCellData[3]) != "") {
                         var DOB = new Date(0, 0, rowCellData[3] - 1, 0, 0, 0);
                         var day = DOB.getDate();
                         var month = DOB.getMonth() + 1;
                         var year = DOB.getFullYear();
                         DOB = (month + "/" + day + "/" + year);
                         if (isNaN(day) || isNaN(month) || isNaN(year)){
-                            finalRowData['DOB'] = rowCellData[3];
+                            finalRowData['DOB'] = String(rowCellData[3]);
                         } else {
                             finalRowData['DOB'] = String(DOB);
                         }
@@ -169,8 +173,12 @@ export function loadLost() {
             console.log(sheetData);
             messageToUser("STARTING FINAL WS COMMIT");
             console.log("STARTING FINAL WS COMMIT");
+            console.log(sheetData);
             commitSheetToWorkbook(currentWS, sheetData, columnHeaders);
             worksheetToCommit.commit();
+            if (secondWorkSheet) {
+                worksheetToCommit2.commit();
+            }
             console.log("END COMMITTING WORKBOOK");
             messageToUser("END COMMITTING WORKBOOK");
             workbook.commit();
@@ -178,12 +186,12 @@ export function loadLost() {
             workbook = null;
         });
         workbookReader.on('error', (err) => {
-        // ...
+            console.log(err);
         });
 
     }
 
-    async function commitSheetToWorkbook(workSheetName, workSheetData, columnHeaders) {
+    function commitSheetToWorkbook(workSheetName, workSheetData, columnHeaders) {
         //For Commiting Worksheets to the new Excel File. Pass the name of the sheet    
         // being iterated over.
 
@@ -200,9 +208,51 @@ export function loadLost() {
         // Commit each row of data to the worksheet
         console.log("Commiting Rows for: " + workSheetName);
         messageToUser("Commiting Rows for: " + String(workSheetName));
+        
         for (let i = 0; i < workSheetData.length; i++) {
-            worksheetToCommit.addRow(workSheetData[i]).commit();
+            if (sheetThreshholdCheck < 1048576) {
+                //console.log("UNDER THRESHOLD");
+                var blankFieldCount = 0;
+                for (var key in workSheetData[i]) {
+                    var value = workSheetData[i][key];
+                    if (value === "") {
+                        blankFieldCount++;      // Checking for mostly blank rows
+                    }
+                }
+                if (blankFieldCount <= 3) {
+                    worksheetToCommit.addRow(workSheetData[i]).commit();
+                    sheetThreshholdCheck++;
+                }
+            } else {
+                //console.log("OVER THRESHOLD");
+                if (secondWorkSheet === false) {
+                    console.log("CREATING SECONDWORKSHEET");
+                    worksheetToCommit2 = workbook.addWorksheet("Sent to APA 2");
+                    // Create the columns from an Array that already has the column values. Do this to style the headers in Excel
+                    var excelColumns = [];
+                    columnHeaders.forEach(value => {
+                        excelColumns.push({header: value, key: value, width: 15});
+                    });
+                    worksheetToCommit2.columns = excelColumns;
+                    secondWorkSheet = true;
+                }
+                var blankFieldCount = 0;
+                for (var key in workSheetData[i]) {
+                    var value = workSheetData[i][key];
+                    if (value === "") {
+                        blankFieldCount++;      // Checking for mostly blank rows
+                    }
+                }
+                if (blankFieldCount <= 3) {
+                    worksheetToCommit2.addRow(workSheetData[i]).commit();
+                    sheetThreshholdCheck++;
+                }
+
+            }
+            
         }
+        
+        
 
         // Commit the Worksheet after all rows have been committed
         //worksheetToCommit.commit();
@@ -213,7 +263,7 @@ export function loadLost() {
 
     }
 
-    async function setWritableWorkbook(columnHeaders) {
+    function setWritableWorkbook(columnHeaders) {
 
         // To create OUT folder on desktop for testing
         try {
@@ -230,7 +280,7 @@ export function loadLost() {
             useSharedStrings: true
         };
         workbook = new ExcelJS.stream.xlsx.WorkbookWriter(options); // Create workbook object for writing new Excel file. Pass options
-        worksheetToCommit = workbook.addWorksheet("2022 Q2 Master File");
+        worksheetToCommit = workbook.addWorksheet("Sent To APA");
 
         // Create the columns from an Array that already has the column values. Do this to style the headers in Excel
         var excelColumns = [];
