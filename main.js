@@ -15,7 +15,7 @@ app.on('ready', function() {
     },
     resizable: false
   });
-  mainWindow.loadFile('src/pages/FP/indexFP.html')
+  mainWindow.loadFile('src/pages/indexMaster.html')
 });
 
 app.on('window-all-closed', () => {

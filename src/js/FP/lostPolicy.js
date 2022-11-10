@@ -13,6 +13,68 @@ export function loadLost() {
     //var submitBtn = document.getElementById('lostPolicy').addEventListener("click", startLostPolicy); // Set listener on Lost Policy Button
     //var submitBtn2 = document.getElementById('keanClean').addEventListener("click", startKeanClean);
 
+    var events = false;
+    var started = false;
+    //var submitBtn = document.getElementById('keanClean').addEventListener("click", startKeanClean); // Set listener on Keen Button
+    document.getElementById("selectionDiv").style.display = "none";
+    document.getElementById("wrapper2FPLost").style.display = "block";
+    document.getElementById("title2").style.display = "block";
+    document.getElementById("title2").innerHTML = "Lost Policy";
+    var exportFileName;
+    
+
+    var cancelButton = document.getElementById("cancelFPLost");
+    var submitButton = document.getElementById("submitFPLost");
+    
+    if (!events) {
+        cancelButton.addEventListener('click', function () {
+            //document.getElementById("wrapper2").style.display = "none";
+            location.reload();
+        });
+    
+        submitButton.addEventListener('click', function () {
+            if (!started) {
+                document.getElementById("noFileMessageLost").textContent = "";
+
+                try {
+                    filePath = document.getElementById('file_upload').files[0].path;
+                    fileName = document.getElementById('file_upload').files[0].name;
+                } catch (error) {
+                    setTimeout(function () {
+                        document.getElementById("noFileMessageLost").textContent = "No File selected! Please select a file.";
+                    }, 1000);
+                    
+                }
+                
+
+
+                if (filePath !== "") {
+                    if (fileName.endsWith(".xlsx")) {
+                        exportFileName = document.getElementById("lostPolicyName").value;
+                        if (exportFileName !== "") {
+                            startLostPolicy();
+                            started = true;
+                            submitButton.style.display = "none";
+                        } else {
+                            setTimeout(function () {
+                                document.getElementById("noFileMessageLost").textContent = "No file/sheet name set. Please name the file/sheet.";
+                            }, 1000);
+                        }
+                        
+                    } else {
+                        setTimeout(function () {
+                            document.getElementById("noFileMessageLost").textContent = "ERROR! You must select a xlsx file.";
+                        }, 1000);
+                    }
+                    
+                } 
+                
+            }
+        });
+    }
+
+    events = true;
+
     // Options for Workbook Writer. Pass it file name. useStyles and useSharedStrings must be true.
     var workbook;
     var worksheetToCommit;
@@ -24,7 +86,7 @@ export function loadLost() {
 
     //     loadKean();
     // }
-    startLostPolicy();
+    
     function startLostPolicy() {
         var sheetData = []; // Sheet data var. We pass this our hashtables from the parsed excel file to write to the new file.
         var currentWS = ''; // Current Worksheet being iterated over
@@ -33,8 +95,8 @@ export function loadLost() {
         document.getElementById("loadingMessage").innerHTML = "Processing: ";
         loadingIcon(true);
         // Grab file path and name.
-        filePath = document.getElementById('file_upload').files[0].path;
-        fileName = document.getElementById('file_upload').files[0].name;
+        // filePath = document.getElementById('file_upload').files[0].path;
+        // fileName = document.getElementById('file_upload').files[0].name;
 
         // START EXCEL LOGIC
 
@@ -208,7 +270,7 @@ export function loadLost() {
         // Commit each row of data to the worksheet
         console.log("Commiting Rows for: " + workSheetName);
         messageToUser("Commiting Rows for: " + String(workSheetName));
-        
+        cancelButton.style.display = "none";
         for (let i = 0; i < workSheetData.length; i++) {
             if (sheetThreshholdCheck < 1048576) {
                 //console.log("UNDER THRESHOLD");
@@ -227,7 +289,7 @@ export function loadLost() {
                 //console.log("OVER THRESHOLD");
                 if (secondWorkSheet === false) {
                     console.log("CREATING SECONDWORKSHEET");
-                    worksheetToCommit2 = workbook.addWorksheet("Sent to APA 2");
+                    worksheetToCommit2 = workbook.addWorksheet(exportFileName + ' 2');
                     // Create the columns from an Array that already has the column values. Do this to style the headers in Excel
                     var excelColumns = [];
                     columnHeaders.forEach(value => {
@@ -275,12 +337,12 @@ export function loadLost() {
         }
 
         const options = {
-            filename: desktopDir + 'OUT\\Lost Policy.xlsx',
+            filename: desktopDir + 'OUT\\' + exportFileName + '.xlsx',
             useStyles: true,
             useSharedStrings: true
         };
         workbook = new ExcelJS.stream.xlsx.WorkbookWriter(options); // Create workbook object for writing new Excel file. Pass options
-        worksheetToCommit = workbook.addWorksheet("Sent To APA");
+        worksheetToCommit = workbook.addWorksheet(exportFileName);
 
         // Create the columns from an Array that already has the column values. Do this to style the headers in Excel
         var excelColumns = [];
@@ -301,6 +363,7 @@ export function loadLost() {
             document.getElementById("loadingMessage").innerHTML = "COMPLETE. File Has been saved in the OUT folder on your Desktop.";
             setTimeout(function () {
                 document.getElementById("loadingMessage").innerHTML = "";
+                location.reload();
             }, 8000);
         }
     }

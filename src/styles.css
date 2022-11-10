@@ -66,7 +66,31 @@
     padding-bottom: 5px;
     /* margin-left: auto;
     margin-right: auto; */
-    width: 25%;
+    width: 50%;
+    margin: auto;
+    color: #659DBD;
+    /* background-color: #1A1A1D; */
+    border-radius: 10px;
+    position: relative;
+}
+
+.submitCancelBtnsDivLost {
+    padding-bottom: 5px;
+    /* margin-left: auto;
+    margin-right: auto; */
+    width: 50%;
+    margin: auto;
+    color: #659DBD;
+    /* background-color: #1A1A1D; */
+    border-radius: 10px;
+    position: relative;
+}
+
+.submitCancelBtnsDivRetro {
+    padding-bottom: 5px;
+    /* margin-left: auto;
+    margin-right: auto; */
+    width: 50%;
     margin: auto;
     color: #659DBD;
     /* background-color: #1A1A1D; */
@@ -79,6 +103,8 @@
     color: #659DBD;
     background-color: #1A1A1D;
     border-radius: 10px;
+    position: relative;
+    left: 25%;
 }
 
 #cancelFPKean {
@@ -87,6 +113,49 @@
 
 #cancelFPKean:hover {
     color: red;
+}
+
+#cancelFPLost {
+    color: white;
+}
+
+#cancelFPLost:hover {
+    color: red;
+}
+
+#cancelRetro {
+    color: white;
+}
+
+#cancelRetro:hover {
+    color: red;
+}
+
+#noFileMessageLost {
+    position: relative;
+    /* left: 17%; */
+    padding-bottom: 5px;
+    text-align: center;
+    color: white;
+    margin: auto;
+}
+
+#noFileMessageKean {
+    position: relative;
+    /* left: 17%; */
+    padding-bottom: 5px;
+    text-align: center;
+    color: white;
+    margin: auto;
+}
+
+#noFileMessageRetro {
+    position: relative;
+    /* left: 17%; */
+    padding-bottom: 5px;
+    text-align: center;
+    color: white;
+    margin: auto;
 }
 
 .submitCancelBtnsStyle:hover {
@@ -107,7 +176,7 @@ body {
 }
 
 .formDivs {
-    margin-left: 15px;
+    margin-left: 30px;
 }
 
 #wrapper2 {
@@ -121,13 +190,22 @@ body {
 
 .formDivsFP {
     margin-left: 15px;
-    
+}
+
+.formDivsFPLost {
+    margin-left: 15px;
 }
 
 #wrapper2FP {
     padding-top: 10px;
     display: none;
 }
+
+#wrapper2FPLost {
+    padding-top: 10px;
+    display: none;
+}
+
 
 #loadingDiv {
     position: relative;

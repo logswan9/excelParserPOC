@@ -31,9 +31,51 @@ export function loadKean() {
     
         submitButton.addEventListener('click', function () {
             if (!started) {
-                startKeanClean();
-                started = true;
-                submitButton.style.display = "none";
+                document.getElementById("noFileMessageKean").textContent = "";
+
+                try {
+                    filePath = document.getElementById('file_upload').files[0].path;
+                    fileName = document.getElementById('file_upload').files[0].name;
+
+                    try {
+                        filePath2 = document.getElementById('file_upload2').files[0].path;
+                        fileName2 = document.getElementById('file_upload2').files[0].name;
+                    } catch (error) {
+                        setTimeout(function () {
+                            document.getElementById("noFileMessageKean").textContent = "No Life Claims Paid File selected! Please select a file.";
+                        }, 1000);
+                    }
+                } catch (error) {
+                    setTimeout(function () {
+                        document.getElementById("noFileMessageKean").textContent = "No File selected! Please select a file.";
+                    }, 1000);
+                    
+                }
+                
+
+
+                if (filePath !== "") {
+                    if (fileName.endsWith(".xlsx")) {
+                        if (filePath2 !== "") {
+                            if (fileName2.endsWith("xlsx")) {
+                                startKeanClean();
+                                started = true;
+                                submitButton.style.display = "none";
+                            } else {
+                                setTimeout(function () {
+                                    document.getElementById("noFileMessageKean").textContent = "ERROR! Life Claims Paid file must be a xlsx file.";
+                                }, 1000);
+                            }
+                        }
+                        
+                    } else {
+                        setTimeout(function () {
+                            document.getElementById("noFileMessageKean").textContent = "ERROR! You must select a xlsx file.";
+                        }, 1000);
+                    }
+                    
+                } 
+
             }
         });
     }
@@ -112,11 +154,11 @@ export function loadKean() {
         document.getElementById("loadingMessage").innerHTML = "Processing: ";
         loadingIcon(true);
         // Grab file path and name.
-        filePath = document.getElementById('file_upload').files[0].path;
-        fileName = document.getElementById('file_upload').files[0].name;
+        // filePath = document.getElementById('file_upload').files[0].path;
+        // fileName = document.getElementById('file_upload').files[0].name;
 
-        filePath2 = document.getElementById('file_upload2').files[0].path;
-        fileName2 = document.getElementById('file_upload2').files[0].name;
+        // filePath2 = document.getElementById('file_upload2').files[0].path;
+        // fileName2 = document.getElementById('file_upload2').files[0].name;
 
         // START EXCEL LOGIC
 
@@ -414,7 +456,7 @@ export function loadKean() {
         }
 
         const options = {
-            filename: desktopDir + 'OUT\\All Results Q2 2022.xlsx',
+            filename: desktopDir + 'OUT\\All Results Q' + quarter + '2022.xlsx',
             useStyles: true,
             useSharedStrings: true
         };
