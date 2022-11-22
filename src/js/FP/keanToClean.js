@@ -90,6 +90,7 @@ export function loadKean() {
     var duplicatesRemovedWS;
     var dodRemovedWS;
     var lifeClaimsRemovedWS;
+    var quarter;
     //startKeanClean();
 
     async function startKeanClean() {
@@ -99,7 +100,7 @@ export function loadKean() {
         var duplicatesRemoved = [];
         var dodRemoved = [];
         var lifeClaimsPaidRemoved = [];
-        var quarter = parseInt(document.getElementById("form1FP").value);
+        quarter = parseInt(document.getElementById("form1FP").value);
         console.log(quarter);
         var lookBack = 0;
         var lookBackDate;
@@ -275,7 +276,7 @@ export function loadKean() {
                 
                 if (rowCount == 0 && !headersSet) {
                     row.eachCell(function(cell) {
-                        columnHeaders.push(cell.text);
+                        columnHeaders.push(cell.text.trim());
                         if (cell.text === "M") {
                             mColumnIndex = headerIndex;  // Account for headers not always being the same index/order
                         }
@@ -284,13 +285,15 @@ export function loadKean() {
                     console.log(row.getCell(52).text); //MIGHT NEED TO CHANGE
                     //console.log(columnHeaders[51]);
                     headersSet = true;
+                    console.log(columnHeaders);
                 }
                 
             
+                
                 if (rowCount > 0) {
                     // We need to push these values to an Array so we can index what specific cell to grab. Otherwise rows may not have the same amount of cells
                     // due to empty cells
-                    if (row.getCell(mColumnIndex).text != '') { // MIGHT NEED TO CHANGEEE!!!
+                    if (row.getCell(mColumnIndex).text != '') { 
                         //console.log(row.getCell(53).text);
                         row.eachCell({includeEmpty: true}, function(cell, cellIndex) { // Iterate over each cell, include empty cells
                             finalRowData[columnHeaders[(cellIndex - 1)]] = String(cell.text);
@@ -456,7 +459,7 @@ export function loadKean() {
         }
 
         const options = {
-            filename: desktopDir + 'OUT\\All Results Q' + quarter + '2022.xlsx',
+            filename: desktopDir + 'OUT\\All Results Q' + quarter + ' 2022.xlsx',
             useStyles: true,
             useSharedStrings: true
         };
