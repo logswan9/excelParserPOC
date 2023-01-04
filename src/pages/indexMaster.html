@@ -12,7 +12,7 @@
     <div class="wrapper">
       
       <h1 id="title">EXcalibur</h1>
-      <input type="file" id="file_upload">
+      <input type="file" id="file_upload" multiple>
       <br>
 
     </div>
@@ -36,6 +36,14 @@
 
         <br>
         <button class="upload-btn" id="checkRun">Check Run</button>
+        <br>
+
+        <br>
+        <button class="upload-btn" id="blankField">Blank Field Search</button>
+        <br>
+
+        <br>
+        <button class="upload-btn" id="employeeChanges">Employee Changes</button>
         <br>
       </div>
 
@@ -121,6 +129,36 @@
             <p id="noFileMessageCheck"></p>
             <button id="cancelCheck" class="submitCancelBtnsStyle">Cancel</button>
             <button id="submitCheck" class="submitCancelBtnsStyle">Submit</button>
+          </div>
+        </div>
+
+        <div class="wrapper2BlankField" id="wrapper2BlankField">
+          <!-- <div class="formDivsBlankField">
+            <label>Forcasted Paid Date: </label>
+            <input type="date" id="checkRunDate" class="form">
+          </div>
+          <br>
+          <div class="formDivsBlankField">
+            <label>Number of processors: </label>
+            <input type="number" id="checkRunPNum" class="form">
+          </div>
+          <br> -->
+          <div class="submitCancelBtnsDivBlankField">
+            <p id="noFileMessageBlankField"></p>
+            <button id="cancelBlankField" class="submitCancelBtnsStyle">Cancel</button>
+            <button id="submitBlankField" class="submitCancelBtnsStyle">Submit</button>
+          </div>
+        </div>
+
+        <div class="wrapper2EmployeeChanges" id="wrapper2EmployeeChanges">
+          <div>
+            <p class="formDivsEmployeeChanges">Please select a new file for comparison:</p>
+            <input type="file" class="file_upload_style" id="file_upload2Emp">
+          </div>
+          <div class="submitCancelBtnsDivEmployeeChanges">
+            <p id="noFileMessageEmployeeChanges"></p>
+            <button id="cancelEmployeeChanges" class="submitCancelBtnsStyle">Cancel</button>
+            <button id="submitEmployeeChanges" class="submitCancelBtnsStyle">Submit</button>
           </div>
         </div>
 

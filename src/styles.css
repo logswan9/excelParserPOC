@@ -98,6 +98,42 @@
     position: relative;
 }
 
+.submitCancelBtnsDivCheck {
+    padding-bottom: 5px;
+    /* margin-left: auto;
+    margin-right: auto; */
+    width: 50%;
+    margin: auto;
+    color: #659DBD;
+    /* background-color: #1A1A1D; */
+    border-radius: 10px;
+    position: relative;
+}
+
+.submitCancelBtnsDivBlankField {
+    padding-bottom: 5px;
+    /* margin-left: auto;
+    margin-right: auto; */
+    width: 50%;
+    margin: auto;
+    color: #659DBD;
+    /* background-color: #1A1A1D; */
+    border-radius: 10px;
+    position: relative;
+}
+
+.submitCancelBtnsDivEmployeeChanges {
+    padding-bottom: 5px;
+    /* margin-left: auto;
+    margin-right: auto; */
+    width: 50%;
+    margin: auto;
+    color: #659DBD;
+    /* background-color: #1A1A1D; */
+    border-radius: 10px;
+    position: relative;
+}
+
 .submitCancelBtnsStyle {
     padding: 5px;
     color: #659DBD;
@@ -131,6 +167,22 @@
     color: red;
 }
 
+#cancelCheck {
+    color: white;
+}
+
+#cancelCheck:hover {
+    color: red;
+}
+
+#cancelEmployeeChanges {
+    color: white;
+}
+
+#cancelEmployeeChanges:hover {
+    color: red;
+}
+
 #noFileMessageLost {
     position: relative;
     /* left: 17%; */
@@ -150,6 +202,24 @@
 }
 
 #noFileMessageRetro {
+    position: relative;
+    /* left: 17%; */
+    padding-bottom: 5px;
+    text-align: center;
+    color: white;
+    margin: auto;
+}
+
+#noFileMessageCheck {
+    position: relative;
+    /* left: 17%; */
+    padding-bottom: 5px;
+    text-align: center;
+    color: white;
+    margin: auto;
+}
+
+#noFileMessageEmployeeChanges {
     position: relative;
     /* left: 17%; */
     padding-bottom: 5px;
@@ -196,12 +266,31 @@ body {
     margin-left: 15px;
 }
 
+.formDivsCheckRun {
+    margin-left: 15px;
+}
+
 #wrapper2FP {
     padding-top: 10px;
     display: none;
 }
 
 #wrapper2FPLost {
+    padding-top: 10px;
+    display: none;
+}
+
+#wrapper2CheckRun {
+    padding-top: 10px;
+    display: none;
+}
+
+#wrapper2BlankField {
+    padding-top: 10px;
+    display: none;
+}
+
+#wrapper2EmployeeChanges {
     padding-top: 10px;
     display: none;
 }

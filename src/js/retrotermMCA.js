@@ -388,9 +388,7 @@ export function loadRetro() {
         console.log("STARTING MCA");
         for (let i = 0; i < mca.length; i++) {
             mcaWS.addRow(mca[i]).commit();
-            if (i > 0) {
-                mcaFINALString += mca[i].CLCL_ID + "\t" + adjReasonG + "\t" + "39" + "\t" + "23" + "\t" + "" + "\t" + "" + "\t" + tomorrowsDate + "\t\"" + projectNoteG + "\"" + "\t" + "A" + "\n";
-            }
+            mcaFINALString += mca[i].CLCL_ID + "\t" + adjReasonG + "\t" + "39" + "\t" + "23" + "\t" + "" + "\t" + "" + "\t" + tomorrowsDate + "\t\"" + projectNoteG + "\"" + "\t" + "A" + "\n";
             
         }
         
